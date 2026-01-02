@@ -1,8 +1,41 @@
 import joblib 
 import pandas as pd 
-from typing import Dict, Any
+from typing import Dict, Any, Literal
 from fastapi import FastAPI
 import uvicorn
+from pydantic import BaseModel, Field, ConfigDict
+
+class Customer(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    gender: Literal["male", "female"]
+    seniorcitizen: Literal[0, 1]
+    partner: Literal["yes", "no"]
+    dependents: Literal["yes", "no"]
+    phoneservice: Literal["yes", "no"]
+    multiplelines: Literal["no", "yes", "no_phone_service"]
+    internetservice: Literal["dsl", "fiber_optic", "no"]
+    onlinesecurity: Literal["no", "yes", "no_internet_service"]
+    onlinebackup: Literal["no", "yes", "no_internet_service"]
+    deviceprotection: Literal["no", "yes", "no_internet_service"]
+    techsupport: Literal["no", "yes", "no_internet_service"]
+    streamingtv: Literal["no", "yes", "no_internet_service"]
+    streamingmovies: Literal["no", "yes", "no_internet_service"]
+    contract: Literal["month-to-month", "one_year", "two_year"]
+    paperlessbilling: Literal["yes", "no"]
+    paymentmethod: Literal[
+        "electronic_check",
+        "mailed_check",
+        "bank_transfer_(automatic)",
+        "credit_card_(automatic)",
+    ]
+    tenure: int = Field(..., ge=0)
+    monthlycharges: float = Field(..., ge=0.0)
+    totalcharges: float = Field(..., ge=0.0)
+
+class PredictResponse(BaseModel):
+    churn_probability: float
+    churn: bool
 
 app = FastAPI(title="predict")
 pipeline = joblib.load("model.pkl")
@@ -14,11 +47,11 @@ def predict_single(customer):
     return float(result)
 
 @app.post("/predict")
-def predict(customer: Dict[str, Any]):
-    result = predict_single(customer)
+def predict(customer: Customer) -> PredictResponse:
+    result = predict_single(customer.model_dump())
     return{
-        'churn_prob': result,
-        'churn': bool(result >= 0.5)
+        'churn_probability': result,
+        'churn': result >= 0.5
     }
 
 if __name__ == "__main__":

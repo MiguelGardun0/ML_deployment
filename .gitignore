@@ -1,2 +1,3 @@
 .venv
 workshop-uv-fastapi.ipynb
+__pycache__
