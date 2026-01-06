@@ -8,10 +8,11 @@ ENV PATH="/code/.venv/bin:$PATH"
 
 COPY "pyproject.toml" "uv.lock" ".python-version" ./
 
-RUN uv sync 
+
+RUN uv sync --locked
 
 COPY "predict.py" "model.pkl" ./
 
 EXPOSE 9696
 
-ENTRYPOINT ["uvicorn", "predict:app", "--host", "0.0.0.0", "--port", "9696"]
+CMD uvicorn predict:app --host 0.0.0.0 --port $PORT

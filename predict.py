@@ -40,6 +40,9 @@ class PredictResponse(BaseModel):
 app = FastAPI(title="predict")
 pipeline = joblib.load("model.pkl")
 
+@app.get("/")
+def init():
+    return "Holaaa"
 
 def predict_single(customer):
     X_new = pd.DataFrame([customer])
@@ -54,5 +57,3 @@ def predict(customer: Customer) -> PredictResponse:
         churn_probability = prob,
         churn = prob >= 0.5
     )
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=9696)

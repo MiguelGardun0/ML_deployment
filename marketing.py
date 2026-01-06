@@ -1,6 +1,6 @@
 import requests 
 
-url = "http://localhost:9696/predict"
+url = "https://predict-churn-app-8f99f938e87b.herokuapp.com/predict"
 
 customer = {
     "gender": "female",
@@ -28,7 +28,7 @@ response = requests.post(url, json=customer)
 churn = response.json() 
 
 print(f"response: {churn}")
-if churn["churn_prob"] >= 0.5:
+if churn["churn_probability"] >= 0.5:
     print("send and email")
 else:
     print("don't send an email")
