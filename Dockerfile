@@ -8,7 +8,7 @@ ENV PATH="/code/.venv/bin:$PATH"
 
 COPY "pyproject.toml" "uv.lock" ".python-version" ./
 
-RUN uv sync --locked
+RUN uv sync 
 
 COPY "predict.py" "model.pkl" ./
 

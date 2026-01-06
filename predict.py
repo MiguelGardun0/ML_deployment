@@ -1,6 +1,6 @@
 import joblib 
 import pandas as pd 
-from typing import Dict, Any, Literal
+from typing import Literal
 from fastapi import FastAPI
 import uvicorn
 from pydantic import BaseModel, Field, ConfigDict
@@ -48,11 +48,11 @@ def predict_single(customer):
 
 @app.post("/predict")
 def predict(customer: Customer) -> PredictResponse:
-    result = predict_single(customer.model_dump())
-    return{
-        'churn_probability': result,
-        'churn': result >= 0.5
-    }
+    prob = predict_single(customer.model_dump())
 
+    return PredictResponse(
+        churn_probability = prob,
+        churn = prob >= 0.5
+    )
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=9696)
